@@ -24,3 +24,5 @@ wandb
 
 # backup directories
 back
+
+run*/

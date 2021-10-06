@@ -317,41 +317,52 @@ class XP:
     def run(self):
         self.prepare()
 
-
-        # import torch
-        # self.trainer.model.load_state_dict(torch.load(
-        #     Path(self.model_args.model_name_or_path)/f"pytorch_model.bin"
-        # ))
-    
-        # self.evaluate()
-        # _device = next(self.trainer.model.parameters()).device
-        # prune_stats = self.patch_coordinator.compile_model(self.trainer.model)
-        # print(prune_stats)
-        # self.trainer.model.to(_device)
-        # # self.trainer.save_model(os.path.join(self.trainer.args.output_dir,"compiled_checkpoint"))
-
-        # from nn_pruning.inference_model_patcher import optimize_model
-        # self.trainer.model = optimize_model(self.trainer.model, "dense")
-        # # self.trainer.save_model(os.path.join(self.trainer.args.output_dir,"optimized_checkpoint"))
-
-        # # Evaluation
-        # results = {}
-        # self.evaluate()
- 
         if self.training_args.do_train:
             self.train()
 
-        # Evaluation
+        # # # Evaluation
         results = {}
         if self.training_args.do_eval:
             self.evaluate()
 
+        import numpy as np
+        import pandas as pd
+        from collections import OrderedDict
+
+        def generate_param_rpt(prefix=''):
+            dlist=[]
+            for n, m in self.trainer.model.named_modules():
+                if m.__class__.__name__ in ["Linear", "MaskedLinear"] and 'classifier' not in n:
+                    l = OrderedDict()
+                    l['linear_id'] = n
+                    l['shape'] = list(m.weight.shape)
+                    l['param_count'] = np.prod(l['shape'])
+                    dlist.append(l)
+            df = pd.DataFrame.from_dict(dlist)
+            linear_layer_total_size_in_mb = df.param_count.sum()/1000/1000
+
+            if self.training_args.output_dir is not None:
+                csvpath = os.path.join(self.training_args.output_dir, 
+                                    "{}linear_layer_stats_total_{:.0f}M.csv".format(
+                                        prefix, linear_layer_total_size_in_mb))
+                df.to_csv(csvpath, index=True)
+
+        generate_param_rpt()
         # cropped model is incompatible with the default model definition of HF, 
         # therefore we save the compiled version only where pruning mask is burnt in.
+        # we can use optimize_model in huggingface examples pipeline
         _device = next(self.trainer.model.parameters()).device
         prune_stats = self.patch_coordinator.compile_model(self.trainer.model)
         self.trainer.model.to(_device)
         self.trainer.save_model(os.path.join(self.trainer.args.output_dir,"compiled_checkpoint"))
+
+        # Following optimize_model is only meant to reflect final model for parameter below
+        # use compiled_checkpoint in practice
+        from nn_pruning.inference_model_patcher import optimize_model
+        self.trainer.model = optimize_model(self.trainer.model, "dense")
+        self.trainer.save_model(os.path.join(self.trainer.args.output_dir,"optimized_checkpoint"))
+
+        generate_param_rpt(prefix="XP_")
 
         return results
 

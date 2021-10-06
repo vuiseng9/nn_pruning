@@ -35,7 +35,7 @@ Gotcha! Many models in model hub are incompatible with v4.10.3, evaluation with 
 
     OUTDIR=baseline-bert-based-uncased-mnli
     WORKDIR=nn_pruning/transformers/examples/pytorch/text-classification
-    cd $WORKDIR
+    cd $WORKDIR && mkdir -p $OUTDIR
 
     nohup python run_glue.py \
         --model_name_or_path vuiseng9/bert-base-uncased-mnli  \
@@ -58,7 +58,7 @@ Gotcha! Many models in model hub are incompatible with v4.10.3, evaluation with 
 
     OUTDIR=blk-pruned-bert-based-uncased-mnli
     WORKDIR=nn_pruning/transformers/examples/pytorch/text-classification
-    cd $WORKDIR
+    cd $WORKDIR && mkdir -p $OUTDIR
 
     nohup python run_glue.py \
         --model_name_or_path nn_pruning/reproduce-eval/text_classification/latest-run-bert-base-block-pruned-mnli/compiled_checkpoint  \

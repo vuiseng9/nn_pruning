@@ -1,3 +1,5 @@
+# Documentation of this fork: see [here](https://github.com/vuiseng9/nn_pruning/blob/reproduce-evaluation/reproduce-eval/readme.md).
+
 # Neural Networks Block Movement Pruning
 
 

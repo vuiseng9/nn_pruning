@@ -209,6 +209,9 @@ def finetune(
         import examples.text_classification.glue_sparse_xp as glue_sparse_xp
         experiment = glue_sparse_xp.GlueSparseXP(param_dict)
 
+    if 'output_dir' in param_dict:
+        with open('/'.join([output_dir, "nn_pruning_params.json"]), "w") as f:
+            json.dump(param_dict, f, sort_keys=True, indent=4)
     # This does not actually use hyper parameter search right now, but it's useful for naming the output directory for example
     experiment.run_from_dict(param_dict)
 

@@ -53,12 +53,12 @@ COMMON_TYPICAL_PARAMETERS = {
     "do_eval": 1,
     "learning_rate": 3e-5,
     "num_train_epochs": 3,
-    "per_device_eval_batch_size": 32,
+    "per_device_eval_batch_size": 128,
     "logging_steps": 250,
     "evaluation_strategy": "steps",
     "eval_steps": 5000,
     "save_steps": 5000,
-    "save_total_limit": 50,
+    "save_total_limit": 10,
     "seed": 17,
     "overwrite_cache": 0,
     "overwrite_output_dir": 1,
@@ -210,6 +210,7 @@ def finetune(
         experiment = glue_sparse_xp.GlueSparseXP(param_dict)
 
     if 'output_dir' in param_dict:
+        Path(output_dir).resolve().mkdir(parents=True, exist_ok=True)
         with open('/'.join([output_dir, "nn_pruning_params.json"]), "w") as f:
             json.dump(param_dict, f, sort_keys=True, indent=4)
     # This does not actually use hyper parameter search right now, but it's useful for naming the output directory for example

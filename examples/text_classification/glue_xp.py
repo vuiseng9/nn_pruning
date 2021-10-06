@@ -138,7 +138,7 @@ class GlueXP(XP):
             num_labels=self.num_labels,
             finetuning_task=self.data_args.dataset_name,
             cache_dir=model_args.cache_dir,
-            **kwargs
+            #**kwargs #fixing for MNLI
         )
 
         return self.config

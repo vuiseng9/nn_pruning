@@ -96,7 +96,7 @@ class SparseGlueShortNamer(TrialShortNamer):
         "model_parallel": False,
         "no_cuda": False,
         "num_train_epochs": 10,
-        "optimize_model_before_eval": "disabled",
+        "optimize_model_before_eval": "dense", # vuiseng9, enable this feature by default
         "output_dir": "output/mnli_test/",
         "overwrite_cache": 0,
         "overwrite_output_dir": 1,

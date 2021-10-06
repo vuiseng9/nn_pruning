@@ -102,7 +102,7 @@ class SparseQAShortNamer(TrialShortNamer):
         "null_score_diff_threshold": 0.0,
         "num_train_epochs": 10,
         "output_dir": "output/squad_test",
-        "optimize_model_before_eval": "disabled",
+        "optimize_model_before_eval": "dense", # vuiseng9, enable this feature by default
         "overwrite_cache": 0,
         "overwrite_output_dir": 1,
         "pad_to_max_length": True,

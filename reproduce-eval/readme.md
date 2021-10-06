@@ -25,7 +25,7 @@ pip3 install torch==1.9.1+cu111 torchvision==0.10.1+cu111 torchaudio==0.9.1 -f h
 pip3 install torch==1.9.1+cpu torchvision==0.10.1+cpu torchaudio==0.9.1 -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
-### bert-base-uncased-MNLI baseline
+### bert-base-uncased-MNLI
 Gotcha! Many models in model hub are incompatible with v4.10.3, evaluation with run_glue.py for the task of MNLI shows unexpected low accuracy, at least it happened at my end. Therefore, we have fine-tuned one with 4.10.3 and shared to model hub, please checkout [vuiseng9/bert-base-uncased-mnli](https://huggingface.co/vuiseng9/bert-base-uncased-mnli). This model serves as baseline and as the teacher model of distillation.
 1. Baseline Task Performance and Latency
     
@@ -52,10 +52,27 @@ Gotcha! Many models in model hub are incompatible with v4.10.3, evaluation with 
     cd nn_pruning/reproduce-eval/text_classification
     ./fine-pruning-mnli.sh
     ```
-    
+    The run outputs to ```nn_pruning/reproduce-eval/text_classification/latest-run-bert-base-block-pruned-mnli```. The final model will be have the head pruned if any and saved as ```compiled_checkpoint```. Execute the following command with the compiled model to obtain post-optimization task performance and latency. Do note that the ```--optimize_model_before_eval``` is needed to crop the linear FFNN layers.
+    ```bash
+    export CUDA_VISIBLE_DEVICES=0
+
+    OUTDIR=blk-pruned-bert-based-uncased-mnli
+    WORKDIR=nn_pruning/transformers/examples/pytorch/text-classification
+    cd $WORKDIR
+
+    nohup python run_glue.py \
+        --model_name_or_path nn_pruning/reproduce-eval/text_classification/latest-run-bert-base-block-pruned-mnli/compiled_checkpoint  \
+        --task_name mnli  \
+        --do_eval  \
+        --optimize_model_before_eval \
+        --per_device_eval_batch_size 128  \
+        --max_seq_length 128  \
+        --overwrite_output_dir \
+        --output_dir $OUTDIR 2>&1 | tee $OUTDIR/run.log &
+    ```
 
 
-### Benchmark Block-pruned Squad
+<!-- ### Benchmark Block-pruned Squad
 ```
 cd nn_pruning/reproduce-eval
 ./benchmark-qa.sh
@@ -79,4 +96,4 @@ cp nn_pruning/reproduce-eval/scripts/results_mnli_download_ckpt.sh .
 cd nn_pruning/analysis
 python command_line.py analyze /data/hf-block-pruning/ --task mnli --output /data/hf-block-pruning/mnli/ckpt_analysis
 # ckpt_analysis_mnli.json will be generated
-```
+``` -->

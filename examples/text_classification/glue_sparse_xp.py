@@ -102,7 +102,7 @@ class SparseGlueShortNamer(TrialShortNamer):
         "overwrite_output_dir": 1,
         "pad_to_max_length": True,
         "past_index": -1,
-        "per_device_eval_batch_size": 8,
+        "per_device_eval_batch_size": 128,
         "per_device_train_batch_size": 1,
         "prediction_loss_only": False,
         "regularization": "l1",

@@ -409,7 +409,7 @@ class TranslationXP(XP):
             "dataset_config_name": dataset_config_name,
             "do_train": 0,
             "do_eval": 1,
-            "per_device_eval_batch_size": 16,
+            "per_device_eval_batch_size": 128,
             "max_target_length": 128,
             "output_dir": str(output_dir),
             "logging_dir": str(output_dir),

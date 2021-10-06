@@ -7,7 +7,7 @@ def readme():
 
 extras = {
     "tests": ["pytest"],
-    "examples": ["numpy>=1.2.0", "datasets>=1.4.1", "ipywidgets>=7.6.3", "matplotlib>=3.3.4", "pandas>=1.2.3"],
+    "examples": ["numpy>=1.2.0", "datasets>=1.4.1", "ipywidgets>=7.6.3", "matplotlib>=3.3.4", "pandas>=1.2.3", "tensorboard"],
 }
 
 def combine_requirements(base_keys):

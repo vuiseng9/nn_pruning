@@ -317,6 +317,27 @@ class XP:
     def run(self):
         self.prepare()
 
+
+        # import torch
+        # self.trainer.model.load_state_dict(torch.load(
+        #     Path(self.model_args.model_name_or_path)/f"pytorch_model.bin"
+        # ))
+    
+        # self.evaluate()
+        # _device = next(self.trainer.model.parameters()).device
+        # prune_stats = self.patch_coordinator.compile_model(self.trainer.model)
+        # print(prune_stats)
+        # self.trainer.model.to(_device)
+        # # self.trainer.save_model(os.path.join(self.trainer.args.output_dir,"compiled_checkpoint"))
+
+        # from nn_pruning.inference_model_patcher import optimize_model
+        # self.trainer.model = optimize_model(self.trainer.model, "dense")
+        # # self.trainer.save_model(os.path.join(self.trainer.args.output_dir,"optimized_checkpoint"))
+
+        # # Evaluation
+        # results = {}
+        # self.evaluate()
+ 
         if self.training_args.do_train:
             self.train()
 
@@ -324,6 +345,13 @@ class XP:
         results = {}
         if self.training_args.do_eval:
             self.evaluate()
+
+        # cropped model is incompatible with the default model definition of HF, 
+        # therefore we save the compiled version only where pruning mask is burnt in.
+        _device = next(self.trainer.model.parameters()).device
+        prune_stats = self.patch_coordinator.compile_model(self.trainer.model)
+        self.trainer.model.to(_device)
+        self.trainer.save_model(os.path.join(self.trainer.args.output_dir,"compiled_checkpoint"))
 
         return results
 

@@ -50,7 +50,10 @@ class SparseXP:
     def model_init(self, trial=None):
         if self.sparse_args.final_finetune:
             try:
-                model = self.compile_model(self.model_args.model_name_or_path)
+
+                model = self.compile_model(
+                    self.model_args.model_name_or_path,
+                    '/'.join([self.training_args.output_dir,"compiled_checkpoint"]))
             except:
                 model = self.CONSTRUCTOR.from_pretrained(self.model_args.model_name_or_path)
             model = optimize_model(model, "dense")

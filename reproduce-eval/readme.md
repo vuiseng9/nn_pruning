@@ -52,7 +52,7 @@ Gotcha! Many models in model hub are incompatible with v4.10.3, evaluation with 
     cd nn_pruning/reproduce-eval/text_classification
     ./fine-pruning-mnli.sh
     ```
-    The run outputs to ```nn_pruning/reproduce-eval/text_classification/latest-run-bert-base-block-pruned-mnli```. The final model will be have the head pruned if any and saved as ```compiled_checkpoint```. Execute the following command with the compiled model to obtain post-optimization task performance and latency. Do note that the ```--optimize_model_before_eval``` is needed to crop the linear FFNN layers.
+    The run outputs to ```nn_pruning/reproduce-eval/text_classification/latest-run-bert-base-uncased-block-pruned-mnli```. The final model will be have the head pruned if any and saved as ```compiled_checkpoint```. Execute the following command with the compiled model to obtain post-optimization task performance and latency. Do note that the ```--optimize_model_before_eval``` is needed to crop the linear FFNN layers.
     ```bash
     export CUDA_VISIBLE_DEVICES=0
 
@@ -61,7 +61,7 @@ Gotcha! Many models in model hub are incompatible with v4.10.3, evaluation with 
     cd $WORKDIR && mkdir -p $OUTDIR
 
     nohup python run_glue.py \
-        --model_name_or_path <path/to>/nn_pruning/reproduce-eval/text_classification/latest-run-bert-base-block-pruned-mnli/compiled_checkpoint  \
+        --model_name_or_path <path/to>/nn_pruning/reproduce-eval/text_classification/latest-run-bert-base-uncased-block-pruned-mnli/compiled_checkpoint  \
         --task_name mnli  \
         --do_eval  \
         --optimize_model_before_eval \

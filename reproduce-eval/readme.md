@@ -1,4 +1,4 @@
-### Objectives
+## Objectives
 This branch (reproduce-eval) aims to provide a step-by-step guide to reproduce a few results published in the paper. We used a specific transformers branching from v4.10.3 (only minor changes for better utility). 
 
 
@@ -25,11 +25,11 @@ pip3 install torch==1.9.1+cu111 torchvision==0.10.1+cu111 torchaudio==0.9.1 -f h
 pip3 install torch==1.9.1+cpu torchvision==0.10.1+cpu torchaudio==0.9.1 -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
-### bert-base-uncased-MNLI
+## bert-base-uncased-MNLI
 Gotcha! Many models in model hub are incompatible with v4.10.3, evaluation with run_glue.py for the task of MNLI shows unexpected low accuracy, at least it happened at my end. Therefore, we have fine-tuned one with 4.10.3 and shared to model hub, please checkout [vuiseng9/bert-base-uncased-mnli](https://huggingface.co/vuiseng9/bert-base-uncased-mnli). This model serves as baseline and as the teacher model of distillation.
 1. Baseline Task Performance and Latency
     
-    According to the paper, all benchmarks are performed with batch size of 128. See ```eval_mnli_results.json``` and ```eval_mnli-mm_results.json``` in the ```$OUTDIR``` for m/mm scores and evaluation latency. ```linear_layer_stats_total_75M.csv``` tabulates parameter breakdown per linear layer in the encoder.
+    According to the paper, all benchmarks are performed with batch size of 128. See ```eval_mnli_results.json``` and ```eval_mnli-mm_results.json``` in the ```$OUTDIR``` for m/mm scores and evaluation latency. ```linear_layer_stats_total_86M.csv``` tabulates parameter breakdown per linear layer in the encoder.
     ```bash
     export CUDA_VISIBLE_DEVICES=0
 
@@ -47,7 +47,7 @@ Gotcha! Many models in model hub are incompatible with v4.10.3, evaluation with 
         --output_dir $OUTDIR 2>&1 | tee $OUTDIR/run.log &
     ```
 
-1. Block Fine-Pruning of bert-base-uncased for MNLI
+1. Block Fine-Pruning of bert-base-uncased for MNLI (hybrid mode w/ distillation)
     ```bash
     cd nn_pruning/reproduce-eval/text_classification
     ./fine-pruning-mnli.sh
@@ -71,6 +71,42 @@ Gotcha! Many models in model hub are incompatible with v4.10.3, evaluation with 
         --output_dir $OUTDIR 2>&1 | tee $OUTDIR/run.log &
     ```
 
+
+## bert-base-uncased-squadv1
+```csarron/bert-base-uncased-squad-v1``` is referenced as SQuADv1-tuned model in the original implementation. We follow the same.
+1. Baseline Task Performance and Latency
+    Similar to MNLI above, batch size of 128 is set. See ```$OUTDIR``` for accuracy and latency reports. 
+    ```bash
+    export CUDA_VISIBLE_DEVICES=0
+
+    OUTDIR=baseline-bert-based-uncased-squad1
+    WORKDIR=nn_pruning/transformers/examples/pytorch/question-answering
+    cd $WORKDIR && mkdir -p $OUTDIR
+
+    nohup python run_qa.py \
+        --model_name_or_path csarron/bert-base-uncased-squad-v1  \
+        --dataset_name squad  \
+        --do_eval  \
+        --per_device_eval_batch_size 128  \
+        --max_seq_length 128  \
+        --doc_stride 128  \
+        --overwrite_output_dir  \
+        --output_dir $OUTDIR 2>&1 | tee $OUTDIR/run.log &
+    ```
+
+1. Block Fine-Pruning of bert-base-uncased for Squadv1 (hybrid mode w/ large teacher distillation)
+    ```bash
+    cd nn_pruning/reproduce-eval/question_answering
+    ./fine-pruning-squadv1.sh
+    ```
+1. Final fine-tuning (Hybrid "Filled" mode)
+    From landing page:
+    - *"Hybrid : prune using blocks for attention and rows/columns for the two large FFNs."*
+    - *"Filled : remove empty heads and empty rows/columns of the FFNs, then re-finetune the previous network, letting the zeros in non-empty attention heads evolve and so regain some accuracy while keeping the same network speed."*
+    ```bash
+    cd nn_pruning/reproduce-eval/question_answering
+    ./final-finetune-squadv1.sh
+    ```
 
 <!-- ### Benchmark Block-pruned Squad
 ```

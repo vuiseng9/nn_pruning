@@ -1,0 +1,173 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "PyTest",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "purpose": ["debug-test"],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Eval MNLI", 
+            "type": "python",
+            "request": "launch",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "1",
+            },
+            "cwd": "${workspaceFolder}/nn_pruning/transformers/examples/pytorch/text-classification/",
+            "program": "run_glue.py",
+            "args": [
+                // most models are not compatible with 4.10.3
+                // "--model_name_or_path", "vuiseng9/bert-base-uncased-mnli",
+                // /home/vchua/hf-transformers/transformers/examples/pytorch/text-classification/bert-based-uncased-mnli",
+                "--model_name_or_path", "/home/vchua/blk-prune/nn_pruning/reproduce-eval/text_classification/run4-bert-base-block-pruned-mnli/compiled_checkpoint",
+                // "--model_name_or_path", "/data/hf-block-pruning/mnli/full_run_mnli_bert_base_hybrid_tinybert_speed_equivalent/checkpoint-135000",
+                "--task_name", "mnli",
+                "--do_eval",
+                "--optimize_model_before_eval",
+                "--per_device_eval_batch_size", "128",
+                "--max_seq_length", "128",
+                "--output_dir", "/tmp/vscode-runs/eval-mnli"
+            ]
+        },
+        {
+            "name": "Eval Squadv1", 
+            // this model has been pretrained and released by official HF
+            // https://huggingface.co/bert-large-uncased-whole-word-masking-finetuned-squad
+            // f1 = 93.1584
+            // exact_match = 86.91
+            // eval_samples = 10784
+            "type": "python",
+            "request": "launch",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0",
+            },
+            "cwd": "${workspaceFolder}/nn_pruning/transformers/examples/pytorch/question-answering/",
+            "program": "run_qa.py",
+            "args": [
+                "--model_name_or_path", 
+                // "csarron/bert-base-uncased-squad-v1",
+                "madlag/bert-base-uncased-squadv1-x2.44-f87.7-d26-hybrid-filled-v1",
+                // "${workspaceFolder}/nn_pruning/reproduce-eval/question_answering/latest-run-bert-base-uncased-block-pruned-squadv1/compiled_checkpoint",
+                // "${workspaceFolder}/nn_pruning/reproduce-eval/question_answering/latest-run-bert-base-uncased-block-pruned-squadv1-final-finetune/squad_test_final_fine_tune/fine_tuned_run3-bert-base-uncased-block-pruned-squadv1/compiled_checkpoint",
+                "--dataset_name", "squad",
+                "--do_eval",
+                "--optimize_model_before_eval",
+                "--per_device_eval_batch_size", "128",
+                "--max_seq_length", "384",
+                "--doc_stride", "128",
+                "--output_dir", "/tmp/vscode-runs/eval-squad-v1"
+            ]
+        },
+        {
+            "name": "Fine Pruning MNLI", 
+            "type": "python",
+            "request": "launch",
+            "justMyCode": false,
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0",
+                "CUDA_LAUNCH_BLOCKING": "1"
+            },
+            "cwd": "${workspaceFolder}/nn_pruning/examples",
+            "program": "command_line.py",
+            "args": [
+                "finetune",
+                "--model-name-or-path", "bert-base-uncased",
+                "--teacher", "vuiseng9/bert-base-uncased-mnli",
+                "--per-device-train-batch-size", "32",
+                "--regularization-final-lambda", "5",
+                "--dense-lambda", "1.0",
+                "--ampere-pruning-method", "disabled",
+                "mnli",
+                "/tmp/vscode-runs/vscode-bert-base-uncased-block-pruned-mnli"
+            ]
+        },
+        {
+            "name": "Fine Pruning Squadv1", 
+            "type": "python",
+            "request": "launch",
+            "justMyCode": false,
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0",
+            },
+            "cwd": "${workspaceFolder}/nn_pruning/examples",
+            "program": "command_line.py",
+            "args": [
+                "finetune",
+                "--json-path", "/home/vchua/blk-prune/nn_pruning/reproduce-eval/question_answering/golden-parameters.json",
+                "squadv1",
+                "/tmp/vscode-runs/dbg-bert-based-block-pruned-squadv1"
+            ]
+        },
+        {
+            "name": "Squad final-finetune", 
+            "type": "python",
+            "request": "launch",
+            "justMyCode": false,
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0",
+            },
+            "cwd": "${workspaceFolder}/nn_pruning/examples",
+            "program": "command_line.py",
+            "args": [
+                "final-finetune",
+                "--checkpoint", 
+                "${workspaceFolder}/nn_pruning/reproduce-eval/question_answering/latest-run-bert-base-uncased-block-pruned-squadv1/checkpoint-110000",
+                "--overwrite",
+                "/tmp/vscode-runs/run-finalft-bert-based-block-pruned-squadv1-checkpoint-110000",
+                "squad",
+            ]
+        },
+        {
+            "name": "Crop Dense FFNN", // out-of-the-box samples, seems to work on model that goes through final-finetune process 
+            "type": "python",
+            "request": "launch",
+            "justMyCode": false,
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0",
+            },
+            "cwd": "${workspaceFolder}/nn_pruning/reproduce-eval/experimental/",
+            "program": "crop_model.py",
+            "args": [
+            ]
+        },
+        {
+            "name": "Benchmark blk-pruned models", 
+            "type": "python",
+            "request": "launch",
+            "justMyCode": false,
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0",
+            },
+            "cwd": "${workspaceFolder}/nn_pruning/reproduce-eval/experimental/",
+            "program": "benchmark_inference.py",
+            "args": [
+            ]
+        },
+        {
+            "name": "Analyze", 
+            "type": "python",
+            "request": "launch",
+            "justMyCode": false,
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0",
+                "CUDA_LAUNCH_BLOCKING": "1"
+            },
+            "cwd": "${workspaceFolder}/nn_pruning/analysis",
+            "program": "command_line.py",
+            "args": [
+                "analyze",
+                "--output", "/home/vchua/blk-prune/nn_pruning/reproduce-eval/question_answering/analyze/test_output",
+                // "--task", "mnli",
+                "--task", "squadv1",
+                "/home/vchua/blk-prune/nn_pruning/reproduce-eval/question_answering/analyze"
+            ]
+        },
+    ]
+}

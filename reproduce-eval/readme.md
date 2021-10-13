@@ -108,13 +108,22 @@ Gotcha! Many models in model hub are incompatible with v4.10.3, evaluation with 
     ./final-finetune-squadv1.sh
     ```
 
-<!-- ### Benchmark Block-pruned Squad
-```
-cd nn_pruning/reproduce-eval
-./benchmark-qa.sh
-```
+## Official Archived Runs
+Thanks to the authors, runs published in the paper have been archived in S3 and are accessible for our reference.
 
-### Download archived checkpoint and Generate Analysis
+Reference runs for two models above:
+```
+# MNLI BERT-base hybrid
+aws s3 sync s3://lagunas-sparsity-experiments/backup/nn_pruning/output/mnli_test2/hp_od-output__mnli_test2___pdtbs32_pdebs128_nte12_ws12000_rn-output__mnli_test2___fw4_rfl5/ full_run_mnli_bert_base_hybrid_tinybert_speed_equivalent/
+
+# Squad BERT-base hybrid run
+aws s3 ls s3://lagunas-sparsity-experiments/backup/nn_pruning/output/squad_test4/hp_od-__data_2to__devel_data__nn_pruning__output__squad4___es-steps_nte20_ls250_stl50_est5000_rn-__data_2to__devel_data__nn_pruning__output__squad4___dpm-sigmoied_threshold:1d_alt_ap--17cd29ad8a563746/
+
+# Squad BERT-base hybrid-filled LT run (checkpoint 110000 above was used)
+aws s3 sync s3://lagunas-sparsity-experiments/backup/nn_pruning/output/squad_test_final_fine_tune/fine_tuned_hp_od-__data_2to__devel_data__nn_pruning__output__squad4___es-steps_nte20_ls250_stl50_est5000_rn-__data_2to__devel_data__nn_pruning__output__squad4___dpm-sigmoied_threshold:1d_alt_ap--17cd29ad8a563746/ /data/hf-block-pruning/squadv1/full_run_squadv1_bert_base_hybrid_filled_lt_f188p3_2p31x
+```
+#### Download archived checkpoint and Generate Analysis
+AWS CLI is required.
 ```bash
 cd nn_pruning/reproduce-eval/scripts
 python generate_bash_s3_crawler.py
@@ -132,4 +141,12 @@ cp nn_pruning/reproduce-eval/scripts/results_mnli_download_ckpt.sh .
 cd nn_pruning/analysis
 python command_line.py analyze /data/hf-block-pruning/ --task mnli --output /data/hf-block-pruning/mnli/ckpt_analysis
 # ckpt_analysis_mnli.json will be generated
+```
+
+<!-- ### Benchmark Block-pruned Squad
+
+# quantization in pytest requires this version
+pip3 install torch==1.8.2+cu111 torchvision==0.9.2+cu111 torchaudio===0.8.2 -f https://download.pytorch.org/whl/lts/1.8/torch_lts.html
 ``` -->
+
+

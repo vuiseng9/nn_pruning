@@ -7,15 +7,12 @@ This branch (reproduce-eval) aims to provide a step-by-step guide to reproduce a
 git clone https://github.com/vuiseng9/nn_pruning
 cd nn_pruning && git checkout reproduce-evaluation
 
-# clone patched transformers branching from v4.10.3
-git submodule init
-git submodule update
-
 # Install nn-pruning
 pip install -e ".[dev]"
 
 # Install transformer
 cd ../transformers
+git checkout tags/v4.9.1 -b v4.9.1 # v4.10.3 was validated as well
 pip install -e .
 
 # Install torch according to your system, following are ones used at my end for this documentation

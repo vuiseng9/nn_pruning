@@ -1,5 +1,5 @@
 ## Objectives
-This branch (reproduce-eval) aims to provide a step-by-step guide to reproduce a few results published in the paper. We used a specific transformers branching from v4.10.3 (only minor changes for better utility). 
+This branch (reproduce-eval) aims to provide a step-by-step guide to reproduce a few results published in the paper. 
 
 
 ### Setup

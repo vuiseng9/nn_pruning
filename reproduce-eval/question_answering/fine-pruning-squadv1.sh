@@ -10,11 +10,11 @@ export WANDB_PROJECT="nncf-mvmt-squad ($(hostname))"
 export CUDA_VISIBLE_DEVICES=0
 
 RUNID=run10-bert-squad-hybrid # !!!!! we need to manually align run_name in parameters.json to reflect this id in wandb
-OUTROOT=/data1/vchua/run/feb-topt/bert-squad/
-WORKDIR=/data1/vchua/dev/feb-topt/nn_pruning/reproduce-eval/question_answering
+OUTROOT=/data1/vchua/run/ssbs-feb/bert-squad/
+WORKDIR=/data1/vchua/dev/ssbs-feb/nn_pruning/reproduce-eval/question_answering
 
 CONDAROOT=/data1/vchua
-CONDAENV=feb-topt
+CONDAENV=ssbs-feb
 # ---------------------------------------------------------------------------------------------
 OUTDIR=$OUTROOT/$RUNID
 mkdir -p $OUTDIR
